@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Proiect Help with Homework"
 include(":app")
+include(":feature:auth")

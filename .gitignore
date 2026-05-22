@@ -1,5 +1,6 @@
 # IntelliJ / Android Studio
 *.iml
+.idea/
 .idea/caches/
 .idea/libraries/
 .idea/modules.xml
