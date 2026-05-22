@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name="com.example.feature.auth.LoginActivity"
+            android:name="com.example.feature.auth.AuthActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
