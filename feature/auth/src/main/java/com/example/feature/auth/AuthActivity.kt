@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.feature.auth.data.AuthRepository
 import com.example.feature.auth.data.local.AppDatabase
+import com.example.feature.auth.data.session.SessionManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AuthActivity : AppCompatActivity() {
@@ -23,6 +25,7 @@ class AuthActivity : AppCompatActivity() {
 
     private var isLoginMode = true
     private lateinit var authRepository: AuthRepository
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +40,16 @@ class AuthActivity : AppCompatActivity() {
         val confirmPasswordInput = findViewById<EditText>(R.id.confirmPasswordInput)
         val submitButton = findViewById<Button>(R.id.submitButton)
         authRepository = AuthRepository(AppDatabase.getInstance(this).userDao())
+        sessionManager = SessionManager(this)
+
+        // Daca utilizatorul este deja logat, sarim peste ecranul de autentificare.
+        lifecycleScope.launch {
+            val isLoggedIn = sessionManager.isLoggedInFlow.first()
+            if (isLoggedIn) {
+                startActivity(Intent(ACTION_OPEN_MAIN))
+                finish()
+            }
+        }
 
         fun updateModeUi() {
             if (isLoginMode) {
@@ -136,6 +149,8 @@ class AuthActivity : AppCompatActivity() {
                         return@launch
                     }
                 }
+
+                sessionManager.setLoggedIn(true)
 
                 // Daca login/register este ok, intram in ecranul principal.
                 startActivity(Intent(ACTION_OPEN_MAIN))

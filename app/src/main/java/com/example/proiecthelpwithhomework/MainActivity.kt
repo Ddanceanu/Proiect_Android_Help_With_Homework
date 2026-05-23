@@ -1,11 +1,16 @@
 package com.example.proiecthelpwithhomework
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.feature.auth.AuthActivity
+import com.example.feature.auth.data.session.SessionManager
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,8 +20,10 @@ class MainActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val addButton = findViewById<Button>(R.id.addButton)
+        val logoutButton = findViewById<Button>(R.id.logoutButton)
         val titleInput = findViewById<EditText>(R.id.titleInput)
         val subjectInput = findViewById<EditText>(R.id.subjectInput)
+        val sessionManager = SessionManager(this)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -26,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             Homework("Legea lui Ohm", "Fizică")
         )
 
-        val adapter = HomeworkAdapter(homeworkList)
+        val adapter = HomeworkAdapter(homeworkList) { /* handled in adapter */ }
         recyclerView.adapter = adapter
 
         addButton.setOnClickListener {
@@ -39,6 +46,16 @@ class MainActivity : AppCompatActivity() {
 
                 titleInput.text.clear()
                 subjectInput.text.clear()
+            }
+        }
+
+        logoutButton.setOnClickListener {
+            lifecycleScope.launch {
+                // Scoatem utilizatorul din sesiune.
+                sessionManager.setLoggedIn(false)
+                // Revenim la ecranul de autentificare.
+                startActivity(Intent(this@MainActivity, AuthActivity::class.java))
+                finish()
             }
         }
     }
