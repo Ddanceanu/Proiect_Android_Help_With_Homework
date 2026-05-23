@@ -7,7 +7,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.feature.auth.data.AuthRepository
+import com.example.feature.auth.data.local.AppDatabase
+import kotlinx.coroutines.launch
 
 class AuthActivity : AppCompatActivity() {
 
@@ -17,6 +22,7 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private var isLoginMode = true
+    private lateinit var authRepository: AuthRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +36,7 @@ class AuthActivity : AppCompatActivity() {
         val passwordInput = findViewById<EditText>(R.id.passwordInput)
         val confirmPasswordInput = findViewById<EditText>(R.id.confirmPasswordInput)
         val submitButton = findViewById<Button>(R.id.submitButton)
+        authRepository = AuthRepository(AppDatabase.getInstance(this).userDao())
 
         fun updateModeUi() {
             if (isLoginMode) {
@@ -110,9 +117,30 @@ class AuthActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Temporar: daca datele sunt valide, intram in ecranul principal.
-            startActivity(Intent(ACTION_OPEN_MAIN))
-            finish()
+            lifecycleScope.launch {
+                if (isLoginMode) {
+                    val loginOk = authRepository.login(email, password)
+                    if (!loginOk) {
+                        Toast.makeText(
+                            this@AuthActivity,
+                            "Email sau parola incorecta",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@launch
+                    }
+                } else {
+                    val registerOk = authRepository.register(name, email, password)
+                    if (!registerOk) {
+                        emailInput.error = "Exista deja cont cu acest email"
+                        emailInput.requestFocus()
+                        return@launch
+                    }
+                }
+
+                // Daca login/register este ok, intram in ecranul principal.
+                startActivity(Intent(ACTION_OPEN_MAIN))
+                finish()
+            }
         }
 
         // Pornim direct in modul Login.
