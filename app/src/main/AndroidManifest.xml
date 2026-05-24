@@ -15,6 +15,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".HomeworkHistoryActivity"
+            android:exported="false"
+            android:label="Activitate" />
+
     </application>
 
 </manifest>
