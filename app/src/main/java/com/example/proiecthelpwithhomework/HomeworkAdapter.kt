@@ -10,11 +10,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class HomeworkAdapter(
-    private val list: MutableList<Homework>,
+    private var list: MutableList<Homework>,
     private val showActions: Boolean = true,
     private val onEdit: ((Homework, Int) -> Unit)? = null,
     private val onDelete: ((Int) -> Unit)? = null,
-    private val onSolve: ((Int) -> Unit)? = null
+    private val onSolve: ((Int) -> Unit)? = null,
+    private val onClick: ((Homework) -> Unit)? = null
 ) : RecyclerView.Adapter<HomeworkAdapter.HomeworkViewHolder>() {
 
     class HomeworkViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -64,7 +65,16 @@ class HomeworkAdapter(
         } else {
             holder.actionButtons.visibility = View.GONE
         }
+
+        holder.itemView.setOnClickListener {
+            onClick?.invoke(item)
+        }
     }
 
     override fun getItemCount(): Int = list.size
+
+    fun updateData(newList: List<Homework>) {
+        this.list = newList.toMutableList()
+        notifyDataSetChanged()
+    }
 }
