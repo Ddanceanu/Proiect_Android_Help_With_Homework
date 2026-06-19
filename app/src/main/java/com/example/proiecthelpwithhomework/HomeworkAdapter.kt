@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class HomeworkAdapter(
@@ -20,6 +21,7 @@ class HomeworkAdapter(
 
     class HomeworkViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.titleText)
+        val statusText: TextView = itemView.findViewById(R.id.statusText)
         val subject: TextView = itemView.findViewById(R.id.subjectText)
         val description: TextView = itemView.findViewById(R.id.descriptionText)
         val duration: TextView = itemView.findViewById(R.id.durationText)
@@ -50,11 +52,15 @@ class HomeworkAdapter(
         holder.userBy.text = userInfo.toString()
 
         if (item.isSolved) {
+            holder.statusText.text = "Rezolvată"
+            holder.statusText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.holo_green_dark))
             holder.title.paintFlags = holder.title.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            holder.solveButton.text = "Anulează"
+            holder.solveButton.text = "Redeschide"
         } else {
+            holder.statusText.text = "Nerezolvată"
+            holder.statusText.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.holo_red_dark))
             holder.title.paintFlags = holder.title.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-            holder.solveButton.text = "Rezolvat"
+            holder.solveButton.text = "Rezolvă"
         }
 
         if (showActions) {

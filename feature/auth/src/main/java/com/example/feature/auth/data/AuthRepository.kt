@@ -36,7 +36,7 @@ class AuthRepository(private val userDao: UserDao) {
         }
     }
 
-    private fun hashPassword(password: String): String {
+    fun hashPassword(password: String): String {
         // Pentru tema este suficient SHA-256, ca sa nu tinem parola in clar.
         val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
         return bytes.joinToString("") { "%02x".format(it) }

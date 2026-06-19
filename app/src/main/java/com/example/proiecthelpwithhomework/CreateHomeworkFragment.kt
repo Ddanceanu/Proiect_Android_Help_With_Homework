@@ -9,16 +9,23 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import com.example.feature.auth.data.session.SessionManager
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class CreateHomeworkFragment : Fragment() {
 
     private val viewModel: HomeworkViewModel by activityViewModels()
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_create_homework, container, false)
+        
+        sessionManager = SessionManager(requireContext())
 
         val titleInput = view.findViewById<EditText>(R.id.titleInput)
         val subjectInput = view.findViewById<EditText>(R.id.subjectInput)
@@ -33,22 +40,26 @@ class CreateHomeworkFragment : Fragment() {
             val duration = durationInput.text.toString()
 
             if (title.isNotEmpty() && subject.isNotEmpty()) {
-                val homework = Homework(
-                    title = title,
-                    subject = subject,
-                    description = description,
-                    duration = duration
-                )
-                viewModel.insert(homework)
-                
-                titleInput.text.clear()
-                subjectInput.text.clear()
-                descriptionInput.text.clear()
-                durationInput.text.clear()
-                
-                Toast.makeText(context, "Homework posted!", Toast.LENGTH_SHORT).show()
+                lifecycleScope.launch {
+                    val userName = sessionManager.userNameFlow.first() ?: "Anonim"
+                    val homework = Homework(
+                        title = title,
+                        subject = subject,
+                        description = description,
+                        duration = duration,
+                        postedBy = userName
+                    )
+                    viewModel.insert(homework)
+                    
+                    titleInput.text.clear()
+                    subjectInput.text.clear()
+                    descriptionInput.text.clear()
+                    durationInput.text.clear()
+                    
+                    Toast.makeText(context, "Temă postată!", Toast.LENGTH_SHORT).show()
+                }
             } else {
-                Toast.makeText(context, "Please fill title and subject", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Te rugăm să completezi titlul și materia", Toast.LENGTH_SHORT).show()
             }
         }
 

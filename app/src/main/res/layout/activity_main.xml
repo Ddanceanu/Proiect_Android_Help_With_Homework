@@ -10,8 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:title="Homework Forum"
-        app:titleTextColor="@android:color/white" />
+        app:title="Forum Teme"
+        app:titleTextColor="@android:color/white">
+
+        <TextView
+            android:id="@+id/userDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"

@@ -12,7 +12,8 @@ data class Homework(
     var description: String,
     var duration: String,
     var isSolved: Boolean = false,
-    var postedBy: String = "Utilizator",
+    var postedBy: String,
     var solvedBy: String? = null,
-    var solution: String? = null
+    var solution: String? = null,
+    var acceptedCommentId: Int? = null
 )

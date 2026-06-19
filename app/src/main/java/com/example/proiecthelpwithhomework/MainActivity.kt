@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +27,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         sessionManager = SessionManager(this)
+        
+        val userDisplay = findViewById<TextView>(R.id.userDisplay)
+        lifecycleScope.launch {
+            sessionManager.userNameFlow.collect { name ->
+                userDisplay.text = name ?: "Anonim"
+            }
+        }
 
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
@@ -35,8 +43,8 @@ class MainActivity : AppCompatActivity() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "Feed"
-                1 -> "Create"
-                else -> "Activity"
+                1 -> "Adaugă"
+                else -> "Activitate"
             }
         }.attach()
     }
@@ -48,6 +56,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, AccountSettingsActivity::class.java))
+                true
+            }
             R.id.action_logout -> {
                 lifecycleScope.launch {
                     sessionManager.setLoggedIn(false)

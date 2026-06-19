@@ -10,18 +10,19 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:title="Homework Detail"
+        app:title="Detalii Temă"
         app:titleTextColor="@android:color/white" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/detailTitle"
@@ -39,6 +40,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp" />
 
+            <TextView
+                android:id="@+id/postedByText"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -47,7 +55,7 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
-                android:text="Description:"
+                android:text="Descriere:"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -67,44 +75,54 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
-                android:text="Solution:"
+                android:text="Soluții și Comentarii:"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/commentsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false" />
+
             <TextView
-                android:id="@+id/detailSolution"
-                android:textSize="16sp"
-                android:text="No solution added yet."
+                android:id="@+id/noSolutionsText"
+                android:text="Nicio soluție adăugată încă."
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
 
-            <LinearLayout
-                android:id="@+id/addSolutionLayout"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:visibility="gone">
-
-                <EditText
-                    android:id="@+id/solutionInput"
-                    android:hint="Type your solution here..."
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minLines="3"
-                    android:gravity="top"
-                    android:inputType="textMultiLine" />
-
-                <Button
-                    android:id="@+id/saveSolutionButton"
-                    android:text="Post Solution"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" />
-            </LinearLayout>
-
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/addSolutionLayout"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@android:color/white"
+        android:elevation="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/solutionInput"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Adaugă o soluție..."
+            android:maxLines="3"
+            android:inputType="textMultiLine" />
+
+        <ImageButton
+            android:id="@+id/saveSolutionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_send"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp" />
+    </LinearLayout>
+
 </LinearLayout>

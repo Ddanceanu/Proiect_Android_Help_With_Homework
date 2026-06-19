@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 class AuthActivity : AppCompatActivity() {
 
     companion object {
-        // Cheie fixa pentru navigare spre ecranul principal.
         private const val ACTION_OPEN_MAIN = "com.example.proiecthelpwithhomework.action.OPEN_MAIN"
     }
 
@@ -42,7 +41,6 @@ class AuthActivity : AppCompatActivity() {
         authRepository = AuthRepository(AppDatabase.getInstance(this).userDao())
         sessionManager = SessionManager(this)
 
-        // Daca utilizatorul este deja logat, sarim peste ecranul de autentificare.
         lifecycleScope.launch {
             val isLoggedIn = sessionManager.isLoggedInFlow.first()
             if (isLoggedIn) {
@@ -53,22 +51,21 @@ class AuthActivity : AppCompatActivity() {
 
         fun updateModeUi() {
             if (isLoginMode) {
-                titleText.text = "Login"
+                titleText.text = "Autentificare"
                 loginTab.isEnabled = false
                 registerTab.isEnabled = true
                 nameInput.visibility = View.GONE
                 confirmPasswordInput.visibility = View.GONE
-                submitButton.text = "Intra in cont"
+                submitButton.text = "Intră în cont"
             } else {
-                titleText.text = "Register"
+                titleText.text = "Înregistrare"
                 loginTab.isEnabled = true
                 registerTab.isEnabled = false
                 nameInput.visibility = View.VISIBLE
                 confirmPasswordInput.visibility = View.VISIBLE
-                submitButton.text = "Creeaza cont"
+                submitButton.text = "Creează cont"
             }
 
-            // Curatam campurile cand schimbam modul.
             nameInput.text.clear()
             emailInput.text.clear()
             passwordInput.text.clear()
@@ -95,70 +92,48 @@ class AuthActivity : AppCompatActivity() {
             val password = passwordInput.text.toString().trim()
             val confirmPassword = confirmPasswordInput.text.toString().trim()
 
-            nameInput.error = null
-            emailInput.error = null
-            passwordInput.error = null
-            confirmPasswordInput.error = null
-
             if (!isLoginMode && name.isEmpty()) {
-                nameInput.error = "Completeaza numele"
-                nameInput.requestFocus()
+                nameInput.error = "Completează numele"
                 return@setOnClickListener
             }
-
             if (email.isEmpty()) {
-                emailInput.error = "Completeaza emailul"
-                emailInput.requestFocus()
+                emailInput.error = "Completează email-ul"
                 return@setOnClickListener
             }
-
             if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 emailInput.error = "Email invalid"
-                emailInput.requestFocus()
                 return@setOnClickListener
             }
-
             if (password.length < 6) {
-                passwordInput.error = "Parola trebuie sa aiba minim 6 caractere"
-                passwordInput.requestFocus()
+                passwordInput.error = "Minim 6 caractere"
                 return@setOnClickListener
             }
-
             if (!isLoginMode && password != confirmPassword) {
                 confirmPasswordInput.error = "Parolele nu coincid"
-                confirmPasswordInput.requestFocus()
                 return@setOnClickListener
             }
 
             lifecycleScope.launch {
                 if (isLoginMode) {
-                    val loginOk = authRepository.login(email, password)
-                    if (!loginOk) {
-                        Toast.makeText(
-                            this@AuthActivity,
-                            "Email sau parola incorecta",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@launch
+                    val user = AppDatabase.getInstance(this@AuthActivity).userDao().getByEmail(email)
+                    if (user != null && authRepository.login(email, password)) {
+                        sessionManager.setLoggedIn(true, user.name, email)
+                        startActivity(Intent(ACTION_OPEN_MAIN))
+                        finish()
+                    } else {
+                        Toast.makeText(this@AuthActivity, "Email sau parolă incorectă", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    val registerOk = authRepository.register(name, email, password)
-                    if (!registerOk) {
-                        emailInput.error = "Exista deja cont cu acest email"
-                        emailInput.requestFocus()
-                        return@launch
+                    if (authRepository.register(name, email, password)) {
+                        sessionManager.setLoggedIn(true, name, email)
+                        startActivity(Intent(ACTION_OPEN_MAIN))
+                        finish()
+                    } else {
+                        Toast.makeText(this@AuthActivity, "Eroare la înregistrare", Toast.LENGTH_SHORT).show()
                     }
                 }
-
-                sessionManager.setLoggedIn(true)
-
-                // Daca login/register este ok, intram in ecranul principal.
-                startActivity(Intent(ACTION_OPEN_MAIN))
-                finish()
             }
         }
-
-        // Pornim direct in modul Login.
         updateModeUi()
     }
 }

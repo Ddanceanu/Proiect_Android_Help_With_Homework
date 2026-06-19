@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.ChipGroup
 
 class HomeworkListFragment : Fragment() {
 
@@ -25,7 +28,8 @@ class HomeworkListFragment : Fragment() {
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val searchEditText = view.findViewById<EditText>(R.id.searchEditText)
-        val sortButton = view.findViewById<View>(R.id.sortButton)
+        val sortButton = view.findViewById<ImageButton>(R.id.sortButton)
+        val filterChipGroup = view.findViewById<ChipGroup>(R.id.filterChipGroup)
         
         recyclerView.layoutManager = LinearLayoutManager(context)
         
@@ -40,6 +44,9 @@ class HomeworkListFragment : Fragment() {
                     putExtra("description", homework.description)
                     putExtra("solution", homework.solution)
                     putExtra("duration", homework.duration)
+                    putExtra("postedBy", homework.postedBy)
+                    putExtra("isSolved", homework.isSolved)
+                    homework.acceptedCommentId?.let { putExtra("acceptedId", it) }
                 }
                 startActivity(intent)
             }
@@ -59,16 +66,35 @@ class HomeworkListFragment : Fragment() {
         })
 
         sortButton.setOnClickListener {
-            // Rudimentary sort toggle: Title vs ID
-            val currentList = viewModel.allHomework.value ?: return@setOnClickListener
-            val sortedList = if (currentList.firstOrNull()?.title == currentList.sortedBy { it.title }.firstOrNull()?.title) {
-                currentList.sortedByDescending { it.id }
-            } else {
-                currentList.sortedBy { it.title }
+            showSortMenu(it)
+        }
+        
+        filterChipGroup.setOnCheckedChangeListener { _, checkedId ->
+            val filter = when (checkedId) {
+                R.id.chipSolved -> FilterStatus.SOLVED
+                R.id.chipUnsolved -> FilterStatus.UNSOLVED
+                else -> FilterStatus.ALL
             }
-            adapter.updateData(sortedList)
+            viewModel.setFilterStatus(filter)
         }
 
         return view
+    }
+
+    private fun showSortMenu(view: View) {
+        val popup = PopupMenu(requireContext(), view)
+        popup.menu.add(0, 1, 0, "După titlu (A-Z)")
+        popup.menu.add(0, 2, 1, "Cele mai noi")
+        popup.menu.add(0, 3, 2, "Stare (Rezolvate/Nerezolvate)")
+        
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> viewModel.setSortType(SortType.TITLE)
+                2 -> viewModel.setSortType(SortType.ID)
+                3 -> viewModel.setSortType(SortType.STATUS)
+            }
+            true
+        }
+        popup.show()
     }
 }
